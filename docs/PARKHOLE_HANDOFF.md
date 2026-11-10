@@ -2,7 +2,7 @@
 
 A silly social app for sharing photos of badly parked vehicles, with a second, serious output: anonymous, aggregated parking-hotspot data for municipalities.
 
-- Repo: https://github.com/Stari89/parkhole (README and docs only; `src/` is empty, a fresh start). Agent/repo conventions: `docs/CLAUDE.md`.
+- Repo: https://github.com/Stari89/parkhole (README and docs only; `src/` is empty, a fresh start). Agent/repo conventions: `CLAUDE.md` at the repo root.
 - Tech stack and app topology: **not decided**.
 - Sibling project: [izi-crawler](https://github.com/Stari89/izi-crawler) — on the back-burner. Its stack (Expo SDK 53 / RN 0.79, NestJS 10 + TypeORM + MySQL, OpenAPI codegen) is a candidate for Parkhole.
 
@@ -217,7 +217,7 @@ HAVING reporter_days >= 3;
 - Rule for "small place" label fallback (segments / buildings per street).
 - Municipal-side resolution: street segment + category vs coarser.
 - Tech stack and app topology: not decided. izi-crawler's stack is a candidate. `src/` is empty until this is settled.
-- Repo setup for agents: `docs/CLAUDE.md` done (uncommitted as of 2026-11-10). Still open: tests from day one, once there is code.
+- Repo setup for agents: `CLAUDE.md` at the repo root, done. Still open: tests from day one, once there is code.
 
 ---
 

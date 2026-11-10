@@ -8,6 +8,14 @@ Open questions are at the bottom.
 
 ---
 
+## 2026-11-10: CLAUDE.md moves to the repo root
+
+**Decision:** `docs/CLAUDE.md` moves to `CLAUDE.md` at the repo root.
+
+**Why:** Claude Code loads `CLAUDE.md` automatically only from the repo root or `.claude/`. In `docs/`, agents working anywhere else might never see the project rules and privacy invariants.
+
+**Supersedes:** the open question "`docs/CLAUDE.md` is not loaded automatically".
+
 ## 2026-11-10: Docs layout
 
 **Decision**
@@ -18,7 +26,7 @@ Open questions are at the bottom.
 
 **Why:** each role gets its own folder, so the final decisions stay in one place, separate from proposals and critiques.
 
-**Supersedes:** the "Repository layout" section of `docs/CLAUDE.md`, which lists only `CLAUDE.md` and `PARKHOLE_HANDOFF.md` under `docs/`. That section hasn't been updated yet.
+**Supersedes:** the old `docs/` list in the "Repository layout" section of `CLAUDE.md`, which named only `CLAUDE.md` and `PARKHOLE_HANDOFF.md`.
 
 ## 2026-11-10: Infra events from the first release
 
@@ -48,5 +56,4 @@ Open questions are at the bottom.
 
 ## Open questions
 
-- **`docs/CLAUDE.md` is not loaded automatically.** Claude Code loads `CLAUDE.md` only from the repo root or `.claude/`. Agents working outside `docs/` may never see its rules. Fixes: move it to the root, or add a root `CLAUDE.md` that imports it.
 - **The product and design open items** are still listed in `PARKHOLE_HANDOFF.md` §10. They move here when the handoff is retired.

@@ -7,7 +7,8 @@ It also has a serious second output: anonymous, aggregated parking-hotspot data 
 ## Docs
 
 - [`docs/PARKHOLE_HANDOFF.md`](docs/PARKHOLE_HANDOFF.md): product and design spec, decisions and open items.
-- [`docs/CLAUDE.md`](docs/CLAUDE.md): repo conventions and privacy invariants for agents.
+- [`docs/DECISIONS.md`](docs/DECISIONS.md): dated log of final product and project decisions.
+- [`CLAUDE.md`](CLAUDE.md): repo conventions and privacy invariants for agents.
 
 ## Repository layout
 

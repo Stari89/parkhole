@@ -18,7 +18,12 @@ The repo has no code yet. The tech stack and the app topology (which apps and se
 ## Repository layout
 
 - `README.md`: project overview.
-- `docs/`: this file and `PARKHOLE_HANDOFF.md`.
+- `CLAUDE.md`: this file.
+- `docs/`: the shared docs, managed by `repo-organizer`:
+  - `DECISIONS.md`: dated log of Damjan's final product and project decisions, plus open questions.
+  - `PARKHOLE_HANDOFF.md`: the original product and design spec, to be retired once `DECISIONS.md` covers it.
+  - `product-visionary/`: `product-visionary`'s ideas and proposals. Only that agent writes here.
+  - `tech-skeptic/`: `tech-skeptic`'s technical reviews and notes. Only that agent writes here.
 - `src/`: empty for now. Code goes here once the stack and topology are decided. Don't create project folders before that.
 - `.claude/`: shared Claude Code settings and agent definitions.
 
