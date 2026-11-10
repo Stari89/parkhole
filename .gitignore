@@ -1,0 +1,14 @@
+# Per-project ignores live in each project under src/ (e.g. src/server-api-v1/.gitignore).
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editors
+.idea/
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+
+# Claude Code: local, per-user settings
+.claude/settings.local.json
