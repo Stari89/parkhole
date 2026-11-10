@@ -8,6 +8,33 @@ Open questions are at the bottom.
 
 ---
 
+## 2026-11-10: The library list is approved
+
+**Decision:** Damjan approved the full library list (28 rows) in `docs/tech-skeptic/2026-11-10-library-choices.md`. That file is the approved list of libraries and versions. The file's own status line still says "proposal", but it is approved as written. The key picks:
+- **Runtime and repo:** Node 24 LTS; npm workspaces with `src/apps/*`, `src/services/*` and `src/packages/*`.
+- **Apps:** Expo SDK 58 (it pins React, React Native and the Expo modules), TanStack Query, react-native-paper, MapLibre (`@maplibre/maplibre-react-native` on native, `maplibre-gl` + `pmtiles` on web), and `onnxruntime-react-native` for D-FINE.
+- **Auth:** better-auth, wired into Nest with the community adapter `@thallesp/nestjs-better-auth`.
+- **Services:** TypeORM 1.x + MySQL 8.4; orval for OpenAPI codegen, with one generated client per API.
+- **Storage:** SeaweedFS as the S3 server, instead of MinIO (AGPL).
+- **Testing:** Jest + SWC; Playwright for the web apps and Maestro for mobile e2e.
+- **Tooling:** ESLint + Prettier + lefthook; GitHub Actions for CI.
+- **Deployment:** Docker Compose + Caddy on the NUC, with separate `main` and `infra` networks and one MySQL container per side.
+
+With this list, the topology follows from today's decisions: three Expo clients in `src/apps/`; the main API, the detection worker, `infra-ingest`, the aggregation job and `municipal-api` in `src/services/`; shared code (such as the generated API clients) in `src/packages/`.
+
+**Follow-ups (spikes, not open decisions):**
+- better-auth with two instances (users and admins) in one Nest app. Required before login is built.
+- TypeORM 1.x with one entity, one migration and one spatial column.
+- ONNX D-FINE through `onnxruntime-react-native` on an Expo 58 development build.
+- h3-js under Hermes.
+- maplibre-react-native on SDK 58.
+
+If a spike fails, the file names the fallback for that row.
+
+**Why:** Damjan's decision, approving `tech-skeptic`'s proposal.
+
+**Supersedes:** the open questions "Exact library versions", "Auth library" and "App topology".
+
 ## 2026-11-10: A maintained auth library, three separate auth setups
 
 **Decision:** auth uses a maintained library instead of hand-rolled JWT. There are three separate auth setups with no shared secrets: Parkhole users, admins and municipal officials. Which library is not decided yet.
@@ -15,6 +42,8 @@ Open questions are at the bottom.
 **Why:** Damjan accepted `tech-skeptic`'s proposal in `docs/tech-skeptic/2026-11-10-tech-stack-review.md`.
 
 **Supersedes:** no earlier decision.
+
+**Superseded by (in part):** "The library list is approved" (same day) picks the library: better-auth.
 
 ## 2026-11-10: The infra side is three separate services
 
@@ -74,6 +103,8 @@ The backoffice and the municipality app are web first. Native builds of them are
 
 **Supersedes:** the stack part of the open item "Tech stack and app topology: not decided" in `PARKHOLE_HANDOFF.md`. The app topology is still open.
 
+**Superseded by (in part):** "The library list is approved" (same day) fixes the versions, the libraries and the topology.
+
 ## 2026-11-10: Git flow
 
 **Decision:** the repo uses standard git flow. `main` holds releases. `develop` is the integration branch and the default branch on GitHub. Work happens on `feature/*`, `release/*` and `hotfix/*` branches. `main` and `develop` are protected: changes land only through pull requests, with no force-push, no deletion and no bypass for anyone.
@@ -130,8 +161,5 @@ The backoffice and the municipality app are web first. Native builds of them are
 
 ## Open questions
 
-- **App topology:** which services exist, how they talk to each other, and the repo layout under `src/`. The infra side is decided (three services, see above); the main side is not.
 - **Production hosting:** not decided.
-- **Exact library versions:** the stack is decided, but the versions and libraries are not final. TypeScript is ~6.0 (see above). `tech-skeptic` is reviewing the rest.
-- **Auth library:** a maintained library is decided, but which one is not.
 - **The product and design open items** are still listed in `PARKHOLE_HANDOFF.md` §10. They move here when the handoff is retired.
