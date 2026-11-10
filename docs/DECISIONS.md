@@ -8,6 +8,14 @@ Open questions are at the bottom.
 
 ---
 
+## 2026-11-10: Hosting is Damjan's own Ubuntu server
+
+**Decision:** all services run on Damjan's own Ubuntu server. The separate Node.js + MariaDB hosting plan that came up the same day is dropped. The database stays MySQL, as in the stack decision.
+
+**Why:** Damjan's decision. The server has far more capacity than Parkhole needs.
+
+**Supersedes:** the open question "Hosting provider". The MariaDB recommendation in `docs/tech-skeptic/2026-11-10-tech-stack-review.md` §10 assumed the hosting plan, so it no longer applies.
+
 ## 2026-11-10: The municipality app starts as a login dashboard
 
 **Decision:** the municipality app starts as a dashboard that municipal officials log in to. A public open-data page may come later.
@@ -94,6 +102,6 @@ The backoffice and the municipality app are web first. Native builds of them are
 ## Open questions
 
 - **App topology:** which services exist, how they talk to each other, and the repo layout under `src/`.
-- **Hosting provider:** not chosen.
+- **Production hosting and server location:** whether the Ubuntu server is used for production, and where it physically sits (home connection or data centre).
 - **Exact library versions:** the stack is decided, but the versions and libraries are not final. `tech-skeptic` is reviewing them.
 - **The product and design open items** are still listed in `PARKHOLE_HANDOFF.md` §10. They move here when the handoff is retired.
