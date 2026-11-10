@@ -8,6 +8,33 @@ Open questions are at the bottom.
 
 ---
 
+## 2026-11-10: A maintained auth library, three separate auth setups
+
+**Decision:** auth uses a maintained library instead of hand-rolled JWT. There are three separate auth setups with no shared secrets: Parkhole users, admins and municipal officials. Which library is not decided yet.
+
+**Why:** Damjan accepted `tech-skeptic`'s proposal in `docs/tech-skeptic/2026-11-10-tech-stack-review.md`.
+
+**Supersedes:** no earlier decision.
+
+## 2026-11-10: The infra side is three separate services
+
+**Decision:** the infra side is three separate services:
+- `infra-ingest`: anonymous, no logs, insert-only DB access;
+- a scheduled aggregation job that writes `published_aggregates`;
+- `municipal-api`: official accounts, reads only `published_aggregates`.
+
+**Why:** Damjan accepted `tech-skeptic`'s proposal in `docs/tech-skeptic/2026-11-10-tech-stack-review.md`.
+
+**Supersedes:** the infra-side part of the open question "App topology".
+
+## 2026-11-10: TypeScript ~6.0 repo-wide for now, not 7
+
+**Decision:** the whole repo uses TypeScript ~6.0 for now, not 7. We move to 7 once the tooling supports it.
+
+**Why:** TS 7.0.2 drops the old compiler API that the `@nestjs/swagger` CLI plugin, `ts-jest` and `typescript-eslint` use, and their peer ranges stop at TS 6. Damjan accepted `tech-skeptic`'s proposal in `docs/tech-skeptic/2026-11-10-tech-stack-review.md`.
+
+**Supersedes:** the TypeScript part of the open question "Exact library versions".
+
 ## 2026-11-10: Development and staging run on Damjan's own Ubuntu server
 
 **Decision:** development and staging, including small-scale beta testing, run on Damjan's own Ubuntu server. It is not for production. The separate Node.js + MariaDB hosting plan that came up the same day is dropped. The database stays MySQL, as in the stack decision.
@@ -103,7 +130,8 @@ The backoffice and the municipality app are web first. Native builds of them are
 
 ## Open questions
 
-- **App topology:** which services exist, how they talk to each other, and the repo layout under `src/`.
+- **App topology:** which services exist, how they talk to each other, and the repo layout under `src/`. The infra side is decided (three services, see above); the main side is not.
 - **Production hosting:** not decided.
-- **Exact library versions:** the stack is decided, but the versions and libraries are not final. `tech-skeptic` is reviewing them.
+- **Exact library versions:** the stack is decided, but the versions and libraries are not final. TypeScript is ~6.0 (see above). `tech-skeptic` is reviewing the rest.
+- **Auth library:** a maintained library is decided, but which one is not.
 - **The product and design open items** are still listed in `PARKHOLE_HANDOFF.md` §10. They move here when the handoff is retired.
