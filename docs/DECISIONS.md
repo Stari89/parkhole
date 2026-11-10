@@ -8,6 +8,14 @@ Open questions are at the bottom.
 
 ---
 
+## 2026-11-10: Git flow
+
+**Decision:** the repo uses standard git flow. `main` holds releases. `develop` is the integration branch and the default branch on GitHub. Work happens on `feature/*`, `release/*` and `hotfix/*` branches. `main` and `develop` are protected: changes land only through pull requests, with no force-push, no deletion and no bypass for anyone.
+
+**Why:** Damjan's decision.
+
+**Supersedes:** direct commits and pushes to `main`.
+
 ## 2026-11-10: CLAUDE.md moves to the repo root
 
 **Decision:** `docs/CLAUDE.md` moves to `CLAUDE.md` at the repo root.
