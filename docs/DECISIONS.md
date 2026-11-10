@@ -8,15 +8,15 @@ Open questions are at the bottom.
 
 ---
 
-## 2026-11-10: Hosting is Damjan's own Ubuntu server
+## 2026-11-10: Development and staging run on Damjan's own Ubuntu server
 
-**Decision:** all services run on Damjan's own Ubuntu server. The separate Node.js + MariaDB hosting plan that came up the same day is dropped. The database stays MySQL, as in the stack decision.
+**Decision:** development and staging, including small-scale beta testing, run on Damjan's own Ubuntu server. It is not for production. The separate Node.js + MariaDB hosting plan that came up the same day is dropped. The database stays MySQL, as in the stack decision.
 
-The server is an ASUS NUC (CU5-225H, 16 GB RAM) at Damjan's parents' home.
+The server is an ASUS NUC (CU5-225H, 16 GB RAM) at Damjan's parents' home, and his parents agree to it. It has 99.5% uptime and a static IP. It also hosts Damjan's other services, which are unrelated to Parkhole.
 
-**Why:** Damjan's decision. The server has far more capacity than Parkhole needs.
+**Why:** Damjan's decision. The server has far more capacity than development and staging need.
 
-**Supersedes:** the open question "Hosting provider", and the "where it physically sits" part of the open question on production hosting. The earlier MariaDB recommendation in `docs/tech-skeptic/2026-11-10-tech-stack-review.md` §10 assumed the hosting plan; `tech-skeptic` has since rewritten §10 for one Ubuntu host on MySQL.
+**Supersedes:** the open question "Hosting provider" for development and staging, and the "where it physically sits" and "is it used for production" parts of the open question on production hosting. The earlier MariaDB recommendation in `docs/tech-skeptic/2026-11-10-tech-stack-review.md` §10 assumed the hosting plan; `tech-skeptic` has since rewritten §10 for one Ubuntu host on MySQL.
 
 ## 2026-11-10: The municipality app starts as a login dashboard
 
@@ -104,6 +104,6 @@ The backoffice and the municipality app are web first. Native builds of them are
 ## Open questions
 
 - **App topology:** which services exist, how they talk to each other, and the repo layout under `src/`.
-- **Production hosting:** whether the Ubuntu server is used for production.
+- **Production hosting:** not decided.
 - **Exact library versions:** the stack is decided, but the versions and libraries are not final. `tech-skeptic` is reviewing them.
 - **The product and design open items** are still listed in `PARKHOLE_HANDOFF.md` §10. They move here when the handoff is retired.
