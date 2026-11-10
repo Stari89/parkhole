@@ -2,15 +2,23 @@
 
 A silly social app for taking and sharing photos of badly parked vehicles.
 
-## Useful Links
+It also has a serious second output: anonymous, aggregated parking-hotspot data for municipalities, starting with Ljubljana. Plates and faces are blurred on the device, and raw photos and GPS never leave the phone.
 
-TODO
+## Docs
 
-## Development
+- [`docs/PARKHOLE_HANDOFF.md`](docs/PARKHOLE_HANDOFF.md): product and design spec, decisions and open items.
+- [`docs/CLAUDE.md`](docs/CLAUDE.md): repo conventions and privacy invariants for agents.
 
-### Environment Setup
+## Repository layout
 
-TODO
+| Path | What |
+|---|---|
+| `docs/` | Project docs |
+| `src/` | Source code (empty for now) |
+
+## Status
+
+There is no code yet. The tech stack and the app topology are not decided.
 
 ## Credits
 
