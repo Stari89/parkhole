@@ -1,6 +1,6 @@
 # Decisions
 
-The log of Damjan's final decisions for Parkhole, newest first. `repo-organizer` maintains it.
+The log of Damjan's final product and project decisions for Parkhole, newest first. `repo-organizer` maintains it. Rules about how the agent team works live in `.claude/agents/`, not here.
 
 Each entry records what was decided, why, and what it supersedes. When a later decision replaces an earlier one, the earlier entry stays and gets a "Superseded by" line.
 
@@ -48,6 +48,5 @@ Open questions are at the bottom.
 
 ## Open questions
 
-- **When can repo-organizer commit?** `docs/CLAUDE.md` and `.claude/agents/repo-organizer.md` say `repo-organizer` may commit and push on its own judgement. The first request was for commits only when Damjan asks, with pushes on its own judgement. Damjan to confirm which.
 - **`docs/CLAUDE.md` is not loaded automatically.** Claude Code loads `CLAUDE.md` only from the repo root or `.claude/`. Agents working outside `docs/` may never see its rules. Fixes: move it to the root, or add a root `CLAUDE.md` that imports it.
 - **The product and design open items** are still listed in `PARKHOLE_HANDOFF.md` §10. They move here when the handoff is retired.
