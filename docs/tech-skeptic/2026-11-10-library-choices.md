@@ -1,6 +1,6 @@
 # Library choices for approval
 
-Date: 2026-11-10. Author: `tech-skeptic`. Status: **proposal for Damjan to approve.** Nothing here is decided.
+Date: 2026-11-10. Author: `tech-skeptic`. Status: **approved by Damjan on 2026-11-10** (see `docs/DECISIONS.md`). Items marked (unverified) still need their spike or check.
 
 **Already accepted by Damjan:** TypeScript 6.0, the three-part infra split (`infra-ingest`, aggregation job, `municipal-api`), a maintained auth library, MySQL 8, and everything on one Ubuntu host (the NUC).
 

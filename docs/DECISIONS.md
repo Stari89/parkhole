@@ -10,7 +10,7 @@ Open questions are at the bottom.
 
 ## 2026-11-10: The library list is approved
 
-**Decision:** Damjan approved the full library list (28 rows) in `docs/tech-skeptic/2026-11-10-library-choices.md`. That file is the approved list of libraries and versions. The file's own status line still says "proposal", but it is approved as written. The key picks:
+**Decision:** Damjan approved the full library list (28 rows) in `docs/tech-skeptic/2026-11-10-library-choices.md`. That file is the approved list of libraries and versions. The key picks:
 - **Runtime and repo:** Node 24 LTS; npm workspaces with `src/apps/*`, `src/services/*` and `src/packages/*`.
 - **Apps:** Expo SDK 58 (it pins React, React Native and the Expo modules), TanStack Query, react-native-paper, MapLibre (`@maplibre/maplibre-react-native` on native, `maplibre-gl` + `pmtiles` on web), and `onnxruntime-react-native` for D-FINE.
 - **Auth:** better-auth, wired into Nest with the community adapter `@thallesp/nestjs-better-auth`.
