@@ -8,6 +8,35 @@ Open questions are at the bottom.
 
 ---
 
+## 2026-11-10: The municipality app starts as a login dashboard
+
+**Decision:** the municipality app starts as a dashboard that municipal officials log in to. A public open-data page may come later.
+
+**Why:** Damjan's decision.
+
+**Supersedes:** no earlier decision.
+
+## 2026-11-10: All clients are Expo apps
+
+**Decision:** Parkhole has three clients, all Expo apps:
+- the mobile app;
+- a backoffice for moderation: approving pending posts and managing the caption pool;
+- a municipality app.
+
+The backoffice and the municipality app are web first. Native builds of them are possible later.
+
+**Why:** Damjan's decision. He may want mobile versions of the backoffice and the municipality app later.
+
+**Supersedes:** no earlier decision.
+
+## 2026-11-10: Tech stack is the izi-crawler stack, brought up to date
+
+**Decision:** Parkhole uses the izi-crawler stack on current versions: Expo / React Native, NestJS + TypeORM + MySQL, and OpenAPI codegen. The exact versions and libraries are not final yet. `tech-skeptic` is reviewing them in `docs/tech-skeptic/`.
+
+**Why:** Damjan's decision.
+
+**Supersedes:** the stack part of the open item "Tech stack and app topology: not decided" in `PARKHOLE_HANDOFF.md`. The app topology is still open.
+
 ## 2026-11-10: Git flow
 
 **Decision:** the repo uses standard git flow. `main` holds releases. `develop` is the integration branch and the default branch on GitHub. Work happens on `feature/*`, `release/*` and `hotfix/*` branches. `main` and `develop` are protected: changes land only through pull requests, with no force-push, no deletion and no bypass for anyone.
@@ -64,4 +93,7 @@ Open questions are at the bottom.
 
 ## Open questions
 
+- **App topology:** which services exist, how they talk to each other, and the repo layout under `src/`.
+- **Hosting provider:** not chosen.
+- **Exact library versions:** the stack is decided, but the versions and libraries are not final. `tech-skeptic` is reviewing them.
 - **The product and design open items** are still listed in `PARKHOLE_HANDOFF.md` §10. They move here when the handoff is retired.

@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Parkhole is a social app for sharing photos of badly parked vehicles. It has a second, serious output: anonymous, aggregated parking-hotspot data for municipalities (Slovenia, starting with Ljubljana). The full product/design spec is in `docs/PARKHOLE_HANDOFF.md`. Read it before designing any feature.
 
-The repo has no code yet. The tech stack and the app topology (which apps and services exist and how they talk to each other) are not decided. The stack of the sibling project izi-crawler (Expo / React Native, NestJS + TypeORM + MySQL, OpenAPI codegen) is a candidate, nothing more. Don't assume a stack or framework until Damjan decides.
+The repo has no code yet. The tech stack is decided: the stack of the sibling project izi-crawler, on current versions (Expo / React Native, NestJS + TypeORM + MySQL, OpenAPI codegen). The exact versions and libraries are not final yet. All three clients (the mobile app, the moderation backoffice and the municipality app) are Expo apps; see `docs/DECISIONS.md`. The app topology (which services exist, how they talk to each other, and the repo layout) is not decided. Don't assume a topology, exact library versions or a hosting provider until Damjan decides.
 
 ## Rules for all agents
 
