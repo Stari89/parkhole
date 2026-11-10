@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Parkhole is a social app for sharing photos of badly parked vehicles. It has a second, serious output: anonymous, aggregated parking-hotspot data for municipalities (Slovenia, starting with Ljubljana). The full product/design spec is in `docs/PARKHOLE_HANDOFF.md`. Read it before designing any feature.
 
-The repo has no code yet. The tech stack and the app topology (which apps and services exist and how they talk to each other) are not decided. The stack of the sibling project izi-crawler (Expo / React Native, NestJS + TypeORM + MySQL, OpenAPI codegen) is a candidate, nothing more. Don't assume a stack or framework until Damjan decides.
+The repo has no code yet. The tech stack, the app topology and the libraries with their versions are decided: see `docs/DECISIONS.md`, and the approved library list in `docs/tech-skeptic/2026-11-10-library-choices.md`. In short: Node 24 LTS, TypeScript ~6.0 and npm workspaces; three Expo SDK 58 clients (the mobile app, the moderation backoffice and the municipality app); NestJS + TypeORM 1.x + MySQL 8.4 services (the main API, a detection worker, `infra-ingest`, an aggregation job and `municipal-api`); orval codegen and better-auth; Docker Compose + Caddy on the NUC for development and staging. Use the versions in that list. Several spikes are still required before the related features are built; `docs/DECISIONS.md` lists them. Production hosting is not decided.
 
 ## Rules for all agents
 
@@ -24,7 +24,7 @@ The repo has no code yet. The tech stack and the app topology (which apps and se
   - `PARKHOLE_HANDOFF.md`: the original product and design spec, to be retired once `DECISIONS.md` covers it.
   - `product-visionary/`: `product-visionary`'s ideas and proposals. Only that agent writes here.
   - `tech-skeptic/`: `tech-skeptic`'s technical reviews and notes. Only that agent writes here.
-- `src/`: empty for now. Code goes here once the stack and topology are decided. Don't create project folders before that.
+- `src/`: empty for now. It will hold npm workspaces in `src/apps/`, `src/services/` and `src/packages/`. It stays empty until scaffolding is planned. Don't create project folders before that.
 - `.claude/`: shared Claude Code settings and agent definitions.
 
 There are no build, lint or test commands yet.

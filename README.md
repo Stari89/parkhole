@@ -19,7 +19,7 @@ It also has a serious second output: anonymous, aggregated parking-hotspot data 
 
 ## Status
 
-There is no code yet. The tech stack and the app topology are not decided.
+There is no code yet. The tech stack, the app topology and the libraries are decided; see [`docs/DECISIONS.md`](docs/DECISIONS.md).
 
 ## Credits
 
