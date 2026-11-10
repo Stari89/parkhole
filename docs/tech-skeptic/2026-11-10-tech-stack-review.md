@@ -154,73 +154,54 @@ The proposal implies **three separate auth realms**: Parkhole users (main API), 
 
 ---
 
-## 10. Hosting: Damjan's Ubuntu server and the Node.js + MariaDB hosting plan
+## 10. Hosting: everything on Damjan's Ubuntu server, MySQL 8
 
-**What I don't know yet, and it changes the answers:** what kind of plan the hosting plan is. It could be shared hosting with Node run behind the host's Apache (for example cPanel with Passenger) or a VPS. Other unknowns: whether access logs can be turned off, the MariaDB version, how many databases and users the plan allows, whether long-running processes, cron and Docker are allowed, outbound email, and disk quota. Also: where the Ubuntu server is (home connection or data centre). Questions for Damjan are at the end of this section.
+**Updated 2026-11-10:** Damjan dropped the Node.js + MariaDB hosting plan. Everything runs on his own Ubuntu server, and the database stays MySQL 8. The earlier MariaDB advice and the two-host split no longer apply. **Still open:** where the server sits (home or data centre) and whether it's used for production.
 
-### 10.1 MariaDB vs MySQL 8
+### 10.1 MySQL 8 notes
 
-**Verdict: target MariaDB everywhere, at the same major version as the hosting plan, including local docker-compose. Use TypeORM's `mariadb` driver type. Medium risk if you mix engines.**
-
-| Area | Difference | Severity | Recommendation |
+| Area | Note | Severity | Recommendation |
 |---|---|---|---|
-| Migrations | Migrations generated against MySQL 8 often fail on MariaDB. The classic case is MySQL 8's default collation `utf8mb4_0900_ai_ci`, which MariaDB doesn't have. Defaults and generated column details also differ. | Medium | Generate and run migrations only against the same MariaDB version as the host. Set charset and collation explicitly (`utf8mb4` with `utf8mb4_unicode_ci`, or a `uca1400` collation if the host's MariaDB is new enough). The empty-migration CI check (8.3) runs on that MariaDB image. |
-| JSON | In MariaDB, `JSON` is an alias for `LONGTEXT` with a validity check. mysql2 returns it as a string, not a parsed object. TypeORM's `json` column type should parse it, but I haven't verified this on TypeORM 1.x. JSON indexing and functions differ between the engines. | Low | Don't query inside JSON. Model `flags` as a join table or fixed boolean columns, which also makes aggregation simpler. Keep JSON only for opaque blobs. Add one test that reads a JSON column back as an object. |
-| Spatial (`features.geom`) | Both support `GEOMETRY` and spatial indexes in InnoDB. MySQL 8 knows coordinate systems: with SRID 4326 it uses lat/lng axis order and computes distances in metres. MariaDB treats the SRID as a label and computes in flat coordinates. Code or queries written for one engine give wrong results on the other: swapped coordinates, or distances in degrees. | Medium | Keep spatial work out of the database. The OSM pipeline already computes geometry. Have it precompute `municipality_code` and the district (9.4) per feature. Store `geom` only for drawing, as WKB or GeoJSON text. Then the engine difference doesn't matter, and the aggregation is plain `GROUP BY`. |
-| Driver | mysql2 speaks the MySQL protocol, which MariaDB supports. Watch for authentication plugin differences on the host. | Low | Fine. Test the connection to the real hosted database early. |
+| Engine | Use one MySQL 8 version, pinned to an exact Docker image tag, in local docker-compose, staging and production. | Low | Generate migrations against that image only. The CI empty-migration check (8.3) uses it too. |
+| JSON | MySQL 8 has a native JSON type, and mysql2 returns it parsed. | Low | Still don't query inside JSON. Model `flags` as a join table or boolean columns, which makes aggregation simpler. |
+| Spatial (`features.geom`) | With SRID 4326, MySQL 8 uses lat/lng axis order in WKT and computes distances in metres. Code that assumes lng/lat gets swapped coordinates. | Low | Have the OSM pipeline precompute `municipality_code` and the district (9.4) per feature. Store `geom` only for drawing. Then aggregation is plain `GROUP BY`. If a spatial query is needed, add one test with a known Ljubljana point. |
 
-### 10.2 Splitting the services across the two hosts
+### 10.2 One host: separating the main side and the infra side
 
-**Verdict: yes, put the infra side (ingest, infra DB, aggregation job, municipal API) on a different host from the main API. It makes the "never link" invariant stronger. It's a must, not a nice-to-have, if the hosting plan can't turn off its access logs.**
+**Verdict: workable, but one host is weaker than two.** The operator, the machine's root account and the hosting network see both sides. If the server is compromised, both sides are. Separation becomes a property of the containers and their config, so it has to be written down and tested, not assumed.
 
-What a separate host fixes:
-- No shared reverse proxy or hosting-edge logs. The hosting provider sees only main-API traffic, never infra events.
-- No shared database server, so no cross-database join, mixed logs or mixed backups (4.5).
-- Credentials stolen from one host can't read the other side's data.
+**What has to be true:**
+- **Separate containers and networks.** The main side is `main-api`, `main-db` (its own MySQL 8 instance) and the detection worker (5.2). The infra side is `infra-ingest`, `infra-db` (its own MySQL 8 instance), the aggregation job and `municipal-api`. Put them on two Docker networks, so a main-side container can't reach `infra-db` and the reverse. Only the reverse proxy joins both.
+- **Separate DB instances** (4.5), separate DB users with the grants from 9.3, separate volumes, and separate, separately encrypted backups.
+- **Separate secrets.** Each side has its own env files or Docker secrets. No container gets the other side's credentials.
+- **One reverse proxy, configured per vhost.**
+  - The ingest hostname (and the PMTiles path) has `access_log off`, and its error log is lowered or discarded, because nginx writes the client IP into error lines.
+  - The main API and the dashboard can log normally on their own vhosts.
+  - The proxy container holds the only log that could link the two sides, so check its config in CI or with a test. One global `log_format` edit can quietly turn ingest logging back on.
+- **No IP-seeing extras.** No fail2ban on the ingest vhost. No Cloudflare proxy or Cloudflare Tunnel in front of ingest. No error tracker or request logger in `infra-ingest` (4.3). Check that Docker's log driver and `journald` get nothing identifying from the infra containers.
+- **Separate hostnames** for ingest, the main API, the dashboard and the tiles. Then the proxy rules stay per vhost, and moving the infra side to its own host later is a DNS change.
+- **The detection worker** stays on the main side's network. It has no access to infra data.
 
-What it doesn't fix:
-- The operator runs both hosts and could log on both.
-- Content matching (4.7).
-- The phone's IP reaches both hosts. "No IP logging" must still be true on the infra host.
+**If the server is at home:** that's fine for development and staging. For production, the open questions are uptime, a dynamic IP, upload bandwidth, the ISP's terms of service and exposing the home network. For a production release, a VPS Damjan controls is safer, and a second small VPS just for the infra side would get back the two-host separation.
 
-**Likely split:**
-
-| Host | Runs | Why |
-|---|---|---|
-| Hosting plan | Main API, main MariaDB, blurred image storage, the backoffice's static web build | The main side needs reliable uptime and normal logging is allowed there. |
-| Ubuntu server | `infra-ingest`, infra MariaDB, aggregation job, `municipal-api`, the municipality app's static web build, PMTiles, the OSM tile pipeline | Full control over nginx, logs and containers is needed for no-IP-logging. |
-
-**What has to be true on the infra host:**
-- **nginx:** `access_log off` on the ingest vhost. Also lower its error log level, or send it to `/dev/null`, because nginx writes the client IP into error lines. Use a separate hostname for ingest.
-- **No log readers:** no fail2ban or similar tools on that vhost, because they read logs with IPs.
-- **No IP-seeing middlebox:** no Cloudflare proxy or Cloudflare Tunnel in front of ingest. They're tempting for a home server, but Cloudflare sees and logs client IPs. Let's Encrypt certificates and a direct connection.
-- **App:** no request logger, no error tracker, no IP-keyed rate limiting (4.3). Check that `journald` and Docker logs get nothing identifying from stdout.
-- **Databases:** the infra MariaDB is its own container, with the DB users from 9.3.
-- **PMTiles:** with the whole-file download (4.6), the request only shows that someone has the app, not where they are. Still, turn access logs off on that path. The municipality app's basemap uses range requests, but its users are officials, so their location isn't sensitive.
-- **If the Ubuntu server is at home:** a residential connection brings uptime, dynamic IP, upload bandwidth and ISP terms of service to consider, and it exposes the home network. That's fine for development. For production, consider a small VPS that Damjan controls instead.
-
-**One conflict to decide (Medium):** the server-side detection pass (5.2) runs ML on the main side's pending images. Shared hosting may not allow that much CPU or long-running workers. Moving the worker to the Ubuntu server would put main-side data on the infra host and weaken the split. If the hosting plan can't run it, keep it in a separate container on the Ubuntu server, with no access to infra data, and accept the weaker split for now. Or run it as a periodic job on another machine.
-
-**Shared hosting limits to check (Medium):** Node behind the host's Apache usually means access logs you can't turn off. It may also mean no WebSockets, cron only, no Docker and a disk quota. Images would then live on local disk, so put storage behind an interface with a local-disk version for the hosting plan and an S3-compatible version for MinIO or real object storage later. Keep the image folder outside the web root. Pending images are served only through the API with backoffice auth (5.1).
+**Image storage:** MinIO in a container on the main side's network (5.1). Use a private bucket, with signed URLs for pending images. Copy an image to public storage only when the post is approved. Don't write images to local disk in the API container (izi-crawler lesson).
 
 ### 10.3 What runs where during development
 
-| Piece | Damjan's Windows machine | Ubuntu server (shared dev and staging) | Hosting plan |
-|---|---|---|---|
-| Main API, `infra-ingest`, `municipal-api` | Run natively with watch mode. File watching is faster than Docker volume mounts on Windows. | Staging containers with docker compose. | Production main API later. |
-| Databases | docker-compose: **two** MariaDB containers (main and infra), same version as the host. | Staging copies. | Production main DB. |
-| Image storage | MinIO container, or the local-disk storage version. | MinIO. | Local disk behind the storage interface. |
-| PMTiles | A small nginx container that serves the file with the same no-logs config as production. | Tile pipeline (Planetiler needs Java and a few GB of RAM for Slovenia), plus the built file. | Not here. |
-| Mobile app | Expo dev server plus a development build on a real phone over the local network. Android blocks plain HTTP by default: allow it only in debug builds, or use HTTPS on staging. | iOS builds still need EAS cloud or a Mac (1.8). | |
-| Backoffice and municipality app (Expo web) | `expo start --web`. | Static exports for staging. | Production backoffice static build here. The municipality app goes next to `municipal-api`. Set CORS per API to its own client origin only. |
-| CI | | GitHub Actions on GitHub's runners. A self-hosted runner on the Ubuntu server is possible, but then CI jobs run on the infra host, so keep it off production infra. | |
+| Piece | Damjan's Windows machine | Ubuntu server (staging, maybe production) |
+|---|---|---|
+| Main API, `infra-ingest`, `municipal-api` | Run natively with watch mode. File watching is faster than Docker volume mounts on Windows. | Containers with docker compose, split into the two networks (10.2). |
+| Databases | docker-compose with **two** MySQL 8 containers (main and infra), same image tag as the server. | Two MySQL 8 containers, separate volumes and backups. |
+| Image storage | MinIO container. | MinIO container on the main side's network. |
+| PMTiles | A small nginx container serving the file with the production no-logs config. | Built by the tile pipeline on the server (Planetiler needs Java and a few GB of RAM for Slovenia), served by the reverse proxy with logs off. |
+| Mobile app | Expo dev server plus a development build on a real phone over the local network. Android blocks plain HTTP by default: allow it only in debug builds, or use staging over HTTPS. | iOS builds still need EAS cloud or a Mac (1.8). |
+| Backoffice and municipality app (Expo web) | `expo start --web`. | Static exports served by the reverse proxy: the backoffice on the main side, the municipality app next to `municipal-api`. Set CORS per API to its own client origin only. |
+| CI | | GitHub Actions on GitHub's runners. Don't use a self-hosted runner on this server, because CI jobs would then run on the host that holds both sides. |
 
 ### 10.4 Questions for Damjan
 
-1. Is the hosting plan shared hosting (Node behind the host's Apache, for example Passenger) or a VPS? Can access logs be turned off per path or domain?
-2. Which MariaDB version does it run, and how many databases and users does the plan allow?
-3. Does it allow long-running background processes, cron, outbound email (for magic links) and enough disk for images?
-4. Is the Ubuntu server at home or in a data centre? Is it meant only for development and staging, or for production infra too?
+1. Is the Ubuntu server at home or in a data centre?
+2. Will it run production, or only development and staging? If production, would a second small VPS for the infra side be acceptable later?
 
 ---
 
@@ -237,6 +218,5 @@ What it doesn't fix:
 - Rounded counts and precomputed fixed slices instead of suppression alone with free filters.
 - A sign-in button page or an emailed one-time code instead of a bare magic link.
 - A folder excluded from backups for the kept original, with fallback to reject plus retake.
-- MariaDB everywhere at the host's version, instead of mixing MariaDB in production with MySQL 8 locally.
 - Spatial work done in the OSM pipeline, instead of in database spatial functions.
-- The infra side on a host Damjan controls, with the main side on the hosting plan.
+- On the single Ubuntu host, separate containers, Docker networks, MySQL instances and secrets per side, and a reverse proxy with logging set per vhost. Later, a second small host for the infra side.
